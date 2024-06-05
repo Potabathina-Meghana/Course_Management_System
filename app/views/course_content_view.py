@@ -25,10 +25,17 @@ def add_course_content_route(course_id):
     title = data['title']
     description = data['description']
     duration = data['duration']
+    if not isinstance(title, str) or not title.strip():
+        return jsonify({'error': 'Invalid value for name'}), 400
+    if not isinstance(description, str) or not description.strip():
+        return jsonify({'error': 'Invalid value for description'}), 400
+    if not isinstance(duration, str) or not duration.strip():  # Assuming duration should be a string
+        return jsonify({'error': 'Invalid value for duration'}), 400
+ 
 
     # Add course content
     add_course_content(course_id, title, description, duration)
-    return jsonify({'message': 'Course content added successfully'}), 201
+    return jsonify({'message': 'Course content created successfully'}), 201
 
 # Update course content
 @course_content_api.route('/api/courses/<int:course_id>/content/<int:content_id>', methods=['PUT'])
@@ -37,7 +44,13 @@ def update_course_content_route(course_id, content_id):
     data = request.json
     if not data:
         return jsonify({'error': 'No JSON data received'}), 400
-
+    
+    content = get_single_course_content(course_id, content_id)
+    if content:
+        return jsonify(content)
+    else:
+        return jsonify({'error': 'Missing course content'}), 400
+    
     # Check if all required keys are present
     required_keys = ['title', 'description', 'duration']
     if not all(key in data for key in required_keys):
@@ -47,6 +60,13 @@ def update_course_content_route(course_id, content_id):
     title = data['title']
     description = data['description']
     duration = data['duration']
+
+    if not isinstance(title, str) or not title.strip():
+        return jsonify({'error': 'Invalid value for name'}), 400
+    if not isinstance(description, str) or not description.strip():
+        return jsonify({'error': 'Invalid value for description'}), 400
+    if not isinstance(duration, str) or not duration.strip():  # Assuming duration should be a string
+        return jsonify({'error': 'Invalid value for duration'}), 400
 
     # Update course content
     update_course_content(course_id, content_id, title, description, duration)
@@ -66,11 +86,13 @@ def get_course_content_route(course_id):
     content = get_course_content(course_id)
     return jsonify(content)
 
-@course_content_api.route('/api/courses/<int:course_id>/content/<int:content_id>', methods=['GET'])
-def get_single_course_content_route(course_id, content_id):
+@course_content_api.route('/api/courses/<int:course_id>/content/<int:course_content_id>', methods=['GET'])
+def get_single_course_content_route(course_id, course_content_id):
     # Get single course content
-    content = get_single_course_content(course_id, content_id)
+    content = get_single_course_content(course_id, course_content_id)
     if content:
         return jsonify(content)
     else:
-        return jsonify({'error': 'Course content not found'}), 404
+        return jsonify({'error': 'Missing course content'}), 400
+    
+    

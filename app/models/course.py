@@ -27,9 +27,19 @@ def update_course_in_database(course_id, name, description, instructor, duration
     MYSQL_CONNECTION.commit()
     cur.close()
 
+
  
+def course_exists(name):
+    cur = MYSQL_CONNECTION.cursor()
+    cur.execute("SELECT COUNT(*) FROM courses WHERE name = %s", (name,))
+    result = cur.fetchone()[0]
+    cur.close()
+    return result > 0
+
+
 def delete_course(name):
     cur = MYSQL_CONNECTION.cursor()
     cur.execute("DELETE FROM courses WHERE name = %s", (name,))
     MYSQL_CONNECTION.commit()
     cur.close()
+
